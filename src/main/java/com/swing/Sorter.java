@@ -23,7 +23,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 public class Sorter {
+    private static final String INTRO_SCREEN_LABEL = "How many numbers to display?";
+    private static final String INCORRECT_INPUT_NUMBER_MESSAGE =
+            "Please enter a non-decimal number";
+    private static final String VALUE_EXCEEDS_LIMIT_MESSAGE = "Please select a value smaller or\n"
+            + "equal to 30.";
     private static final int MAX_COMPONENT_IN_COLUMN = 10;
+    private static final int VISUALIZATION_DELAY = 200;
+    private static final int MAX_RANDOM_NUMBER = 1000;
+    private static final int MAX_INITIAL_RANDOM_NUMBER = 30;
     private JFrame frame;
     private JPanel introScreen;
     private JPanel leftPanel;
@@ -69,7 +77,7 @@ public class Sorter {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.CENTER;
-        introScreen.add(new JLabel("How many numbers to display?"), constraints);
+        introScreen.add(new JLabel(INTRO_SCREEN_LABEL), constraints);
 
         constraints.gridy = 1;
         inputField = new JTextField(5);
@@ -87,7 +95,7 @@ public class Sorter {
                     createNumberButtons(Integer.parseInt(inputField.getText()));
                     cardLayout.show(contentPane, "splitPane");
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(frame, "Please enter a non-decimal number");
+                    JOptionPane.showMessageDialog(frame, INCORRECT_INPUT_NUMBER_MESSAGE);
                 }
             }
         });
@@ -145,9 +153,9 @@ public class Sorter {
         buttons = new JButton[numButtons];
 
         for (int i = 0; i < numButtons; i++) {
-            int randomNumber = new Random().nextInt(1000);
-            if (i == 0 && randomNumber >= 30) {
-                randomNumber = new Random().nextInt(30);
+            int randomNumber = new Random().nextInt(MAX_RANDOM_NUMBER);
+            if (i == 0 && randomNumber >= MAX_INITIAL_RANDOM_NUMBER) {
+                randomNumber = new Random().nextInt(MAX_INITIAL_RANDOM_NUMBER);
             }
             JButton current = new JButton(Integer.toString(randomNumber));
             buttons[i] = current;
@@ -167,8 +175,7 @@ public class Sorter {
                 int value = Integer.parseInt(current.getText());
                 if (value > 30) {
                     JOptionPane.showMessageDialog(frame,
-                            "Please select a value smaller or\n"
-                                    + "equal to 30.",
+                            VALUE_EXCEEDS_LIMIT_MESSAGE,
                             "Message", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     createNumberButtons(buttons.length);
@@ -221,49 +228,53 @@ public class Sorter {
             frame.revalidate();
             frame.repaint();
         }
-    }
 
-    public void quickSort(int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(low, high);
+        private void quickSort(int low, int high) {
+            if (low < high) {
+                int pivotIndex = partition(low, high);
+                sleep();
+                // Recursive sorting of the left and right parts
+                quickSort(low, pivotIndex - 1);
+                quickSort(pivotIndex + 1, high);
+            }
+        }
+
+        private void sleep() {
             try {
-                Thread.sleep(200); // Delay for visualization
+                Thread.sleep(VISUALIZATION_DELAY); // Delay for visualization
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // Recursive sorting of the left and right parts
-            quickSort(low, pivotIndex - 1);
-            quickSort(pivotIndex + 1, high);
         }
-    }
 
-    public int partition(int low, int high) {
-        int pivot = Integer.parseInt(buttons[high].getText());
-        int i = low - 1;
+        private int partition(int low, int high) {
+            int pivot = Integer.parseInt(buttons[high].getText());
+            int i = low - 1;
 
-        for (int j = low; j < high; j++) {
-            if (compare(Integer.parseInt(buttons[j].getText()), pivot)) {
-                i++;
-                String tempText = buttons[i].getText();
-                buttons[i].setText(buttons[j].getText());
-                buttons[j].setText(tempText);
+            for (int j = low; j < high; j++) {
+                if (compare(Integer.parseInt(buttons[j].getText()), pivot)) {
+                    i++;
+                    String tempText = buttons[i].getText();
+                    buttons[i].setText(buttons[j].getText());
+                    buttons[j].setText(tempText);
+                }
+            }
+            String tempText = buttons[i + 1].getText();
+            buttons[i + 1].setText(buttons[high].getText());
+            buttons[high].setText(tempText);
+
+            return i + 1;
+        }
+
+        private void updateButtonLabels() {
+            for (JButton button : buttons) {
+                button.setText(button.getText());
             }
         }
-        String tempText = buttons[i + 1].getText();
-        buttons[i + 1].setText(buttons[high].getText());
-        buttons[high].setText(tempText);
 
-        return i + 1;
-    }
-
-    public void updateButtonLabels() {
-        for (JButton button : buttons) {
-            button.setText(button.getText());
+        // Determines the direction of sorting
+        private boolean compare(int a, int b) {
+            return sortDirection == 1 ? a < b : a > b;
         }
-    }
-
-    // Determines the direction of sorting
-    public boolean compare(int a, int b) {
-        return sortDirection == 1 ? a < b : a > b;
     }
 }
