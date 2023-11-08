@@ -23,15 +23,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 public class Sorter {
+    private static final int FRAME_WIDTH = 800;
+    private static final int FRAME_HEIGHT = 500;
+    private static final int MAX_COMPONENT_IN_COLUMN = 10;
+    private static final int VISUALIZATION_DELAY = 200;
+    private static final int MAX_RANDOM_NUMBER = 1000;
+    private static final int MAX_INITIAL_RANDOM_NUMBER = 30;
     private static final String INTRO_SCREEN_LABEL = "How many numbers to display?";
     private static final String INCORRECT_INPUT_NUMBER_MESSAGE =
             "Please enter a non-decimal number";
     private static final String VALUE_EXCEEDS_LIMIT_MESSAGE = "Please select a value smaller or\n"
             + "equal to 30.";
-    private static final int MAX_COMPONENT_IN_COLUMN = 10;
-    private static final int VISUALIZATION_DELAY = 200;
-    private static final int MAX_RANDOM_NUMBER = 1000;
-    private static final int MAX_INITIAL_RANDOM_NUMBER = 30;
     private JFrame frame;
     private JPanel introScreen;
     private JPanel leftPanel;
@@ -52,7 +54,7 @@ public class Sorter {
         frame.getRootPane().setBorder(BorderFactory
                 .createEmptyBorder(10, 40, 10, 40));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 500);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 
         createIntroScreen();
         createSortScreen();
