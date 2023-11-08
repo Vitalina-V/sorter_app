@@ -34,6 +34,13 @@ public class Sorter {
             "Please enter a non-decimal number";
     private static final String VALUE_EXCEEDS_LIMIT_MESSAGE = "Please select a value smaller or\n"
             + "equal to 30.";
+    private static final String FRAME_NAME = "Sorter";
+    private static final String ENTER_BUTTON_TEXT = "Enter";
+    private static final String RESET_BUTTON_TEXT = "Reset";
+    private static final String SORT_BUTTON_TEXT = "Sort";
+    private static final String INTRO_SCREEN_PANEL_NAME = "introScreen";
+    private static final String SPLIT_PANE_NAME = "splitPane";
+    private static final Random RANDOM = new Random();
     private JFrame frame;
     private JPanel introScreen;
     private JPanel leftPanel;
@@ -48,9 +55,11 @@ public class Sorter {
         SwingUtilities.invokeLater(() -> new Sorter().createAndShowUI());
     }
 
+    /**
+     * Create the main window of the application
+     */
     private void createAndShowUI() {
-        // Creating the main window of the application
-        frame = new JFrame("Sorter");
+        frame = new JFrame(FRAME_NAME);
         frame.getRootPane().setBorder(BorderFactory
                 .createEmptyBorder(10, 40, 10, 40));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,14 +71,16 @@ public class Sorter {
         cardLayout = new CardLayout();
         contentPane = new JPanel(cardLayout);
 
-        contentPane.add(introScreen, "introScreen");
-        contentPane.add(splitPane, "splitPane");
+        contentPane.add(introScreen, INTRO_SCREEN_PANEL_NAME);
+        contentPane.add(splitPane, SPLIT_PANE_NAME);
 
         frame.setContentPane(contentPane);
         frame.setVisible(true);
     }
 
-    // Creating the first screen
+    /**
+     * Create the first screen
+     */
     private void createIntroScreen() {
         introScreen = new JPanel();
         introScreen.setLayout(new GridBagLayout());
@@ -88,24 +99,27 @@ public class Sorter {
         createIntroScreenButtons(constraints);
     }
 
+    /**
+     * Create buttons for the first screen
+     * @param constraints imposes constraints on the GridBagLayout
+     */
     private void createIntroScreenButtons(GridBagConstraints constraints) {
-        JButton enterButton = new JButton("Enter");
-        enterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    createNumberButtons(Integer.parseInt(inputField.getText()));
-                    cardLayout.show(contentPane, "splitPane");
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(frame, INCORRECT_INPUT_NUMBER_MESSAGE);
-                }
+        JButton enterButton = new JButton(ENTER_BUTTON_TEXT);
+        enterButton.addActionListener(e -> {
+            try {
+                createNumberButtons(Integer.parseInt(inputField.getText()));
+                cardLayout.show(contentPane, SPLIT_PANE_NAME);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, INCORRECT_INPUT_NUMBER_MESSAGE);
             }
         });
         constraints.gridy = 2;
         introScreen.add(enterButton, constraints);
     }
 
-    // Creating the second screen
+    /**
+     * Create the second screen
+     */
     private void createSortScreen() {
         leftPanel = new JPanel();
         JPanel rightPanel = new JPanel();
@@ -117,8 +131,12 @@ public class Sorter {
         createSortAndResetButtons(rightPanel);
     }
 
+    /**
+     * Create control buttons for the second screen
+     * @param panel indicates the panel where the buttons should be placed
+     */
     private void createSortAndResetButtons(JPanel panel) {
-        JButton resetButton = new JButton("Reset");
+        JButton resetButton = new JButton(RESET_BUTTON_TEXT);
         resetButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
         resetButton.setMaximumSize(new Dimension(100,
                 resetButton.getPreferredSize().height));
@@ -126,20 +144,16 @@ public class Sorter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 inputField.setText(""); // Clearing the TextField
-                cardLayout.show(contentPane, "introScreen"); // Return to the intro screen
+                cardLayout.show(contentPane, INTRO_SCREEN_PANEL_NAME); // Return to the intro screen
             }
         });
-
-        JButton sortButton = new JButton("Sort");
+        JButton sortButton = new JButton(SORT_BUTTON_TEXT);
         sortButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
         sortButton.setMaximumSize(new Dimension(100,
                 sortButton.getPreferredSize().height));
-        sortButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                QuickSorter worker = new QuickSorter();
-                worker.execute();
-            }
+        sortButton.addActionListener(e -> {
+            QuickSorter worker = new QuickSorter();
+            worker.execute();
         });
         // Adding padding to the panel
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -149,15 +163,18 @@ public class Sorter {
         panel.add(sortButton);
     }
 
-    // Creating buttons with random numbers
+    /**
+     * Create buttons with random numbers
+     * @param numButtons indicates the number of buttons to be generated
+     */
     private void createNumberButtons(int numButtons) {
         leftPanel.removeAll();
         buttons = new JButton[numButtons];
 
         for (int i = 0; i < numButtons; i++) {
-            int randomNumber = new Random().nextInt(MAX_RANDOM_NUMBER);
+            int randomNumber = RANDOM.nextInt(MAX_RANDOM_NUMBER);
             if (i == 0 && randomNumber >= MAX_INITIAL_RANDOM_NUMBER) {
-                randomNumber = new Random().nextInt(MAX_INITIAL_RANDOM_NUMBER);
+                randomNumber = RANDOM.nextInt(MAX_INITIAL_RANDOM_NUMBER);
             }
             JButton current = new JButton(Integer.toString(randomNumber));
             buttons[i] = current;
@@ -166,29 +183,31 @@ public class Sorter {
         addButtonsToColumns(numButtons);
     }
 
-    // Customize buttons
+    /**
+     * Customize created number buttons
+     * @param current indicates the button to be customized
+     */
     private void setupNumberButton(JButton current) {
         current.setMaximumSize(new Dimension(Integer.MAX_VALUE,
                 current.getMinimumSize().height));
 
-        current.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int value = Integer.parseInt(current.getText());
-                if (value > 30) {
-                    JOptionPane.showMessageDialog(frame,
-                            VALUE_EXCEEDS_LIMIT_MESSAGE,
-                            "Message", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    createNumberButtons(buttons.length);
-                    leftPanel.revalidate();
-                    leftPanel.repaint();
-                }
+        current.addActionListener(e -> {
+            int value = Integer.parseInt(current.getText());
+            if (value > 30) {
+                JOptionPane.showMessageDialog(frame,
+                        VALUE_EXCEEDS_LIMIT_MESSAGE);
+            } else {
+                createNumberButtons(value);
+                leftPanel.revalidate();
+                leftPanel.repaint();
             }
         });
     }
 
-    // Placement of number buttons in the form of columns
+    /**
+     * Places number buttons in the form of columns
+     * @param numButtons indicates the number of buttons
+     */
     private void addButtonsToColumns(int numButtons) {
         JPanel panel = new JPanel();
 
@@ -214,33 +233,50 @@ public class Sorter {
         leftPanel.add(panel);
     }
 
+    /**
+     * The QuickSorter class is responsible for performing the Quick Sort algorithm.
+     * It extends SwingWorker to allow sorting to be done in the background
+     * while providing updates to the UI.
+     */
     private class QuickSorter extends SwingWorker<Void, Void> {
+        /**
+         * Invokes the quick sort method and updates the sort direction
+         */
         @Override
         protected Void doInBackground() {
-            // Invokes the quick sort method and updates the sort direction
             quickSort(0, buttons.length - 1);
             sortDirection *= -1;
             return null;
         }
 
+        /**
+         * Refreshes the buttons after sorting is complete
+         */
         @Override
         protected void done() {
-            // Refreshes the buttons after sorting is complete
             updateButtonLabels();
             frame.revalidate();
             frame.repaint();
         }
 
+        /**
+         * Recursively sorts a portion of the array of buttons using the Quick Sort algorithm.
+         *
+         * @param low  The lowest index of the portion to be sorted.
+         * @param high The highest index of the portion to be sorted.
+         */
         private void quickSort(int low, int high) {
             if (low < high) {
                 int pivotIndex = partition(low, high);
                 sleep();
-                // Recursive sorting of the left and right parts
                 quickSort(low, pivotIndex - 1);
                 quickSort(pivotIndex + 1, high);
             }
         }
 
+        /**
+         * Sleeps the current thread for a specified duration to allow visualization.
+         */
         private void sleep() {
             try {
                 Thread.sleep(VISUALIZATION_DELAY); // Delay for visualization
@@ -249,6 +285,13 @@ public class Sorter {
             }
         }
 
+        /**
+         * Partitions a portion of the array of buttons based on the pivot value.
+         *
+         * @param low  The lowest index of the portion to be partitioned.
+         * @param high The highest index of the portion to be partitioned.
+         * @return The index of the pivot element after partitioning.
+         */
         private int partition(int low, int high) {
             int pivot = Integer.parseInt(buttons[high].getText());
             int i = low - 1;
@@ -268,13 +311,22 @@ public class Sorter {
             return i + 1;
         }
 
+        /**
+         * Updates the labels of the buttons to refresh their display.
+         */
         private void updateButtonLabels() {
             for (JButton button : buttons) {
                 button.setText(button.getText());
             }
         }
 
-        // Determines the direction of sorting
+        /**
+         * Compares two integers based on the sorting direction.
+         *
+         * @param a The first integer to compare.
+         * @param b The second integer to compare.
+         * @return a boolean on which the sort order depends
+         */
         private boolean compare(int a, int b) {
             return sortDirection == 1 ? a < b : a > b;
         }
