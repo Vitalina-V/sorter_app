@@ -14,4 +14,4 @@ Sorter App allows you to define the number of numbers you want to display and au
 - Simple and intuitive user interface.
 
 ### How to run
-To run the Sorter App, you must have Java Runtime Environment (JRE) version 8 or higher installed.
+To run the Sorter App, you must have Java Runtime Environment (JRE) version 18 or higher installed.
